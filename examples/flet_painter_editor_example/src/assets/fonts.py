@@ -1,0 +1,21 @@
+FONTS = {
+  "Abril_Fatface": "/fonts/Abril_Fatface/AbrilFatface-Regular.ttf",
+  "Adamina": "/fonts/Adamina/Adamina-Regular.ttf",
+  "Aladin": "/fonts/Aladin/Aladin-Regular.ttf",
+  "Amatic_SC": "/fonts/Amatic_SC/AmaticSC-Bold.ttf",
+  "Berkshire_Swash": "/fonts/Berkshire_Swash/BerkshireSwash-Regular.ttf",
+  "Bungee": "/fonts/Bungee/Bungee-Regular.ttf",
+  "Cairo": "/fonts/Cairo/Cairo-VariableFont_slnt,wght.ttf",
+  "Fondamento": "/fonts/Fondamento/Fondamento-Italic.ttf",
+  "Indie_Flower": "/fonts/Indie_Flower/IndieFlower-Regular.ttf",
+  "Inter": "/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf",
+  "Leckerli_One": "/fonts/Leckerli_One/LeckerliOne-Regular.ttf",
+  "Open_Sans": "/fonts/Open_Sans/OpenSans-Italic-VariableFont_wdth,wght.ttf",
+  "Oswald": "/fonts/Oswald/Oswald-VariableFont_wght.ttf",
+  "Pacifico": "/fonts/Pacifico/Pacifico-Regular.ttf",
+  "Patrick_Hand": "/fonts/Patrick_Hand/PatrickHand-Regular.ttf",
+  "Roboto_Italic": "/fonts/Roboto/Roboto-Italic-VariableFont_wdth,wght.ttf",
+  "Roboto": "/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf",
+  "Rubik": "/fonts/Rubik/Rubik-Italic-VariableFont_wght.ttf",
+  "Tinos": "/fonts/Tinos/Tinos-Bold.ttf"
+}
