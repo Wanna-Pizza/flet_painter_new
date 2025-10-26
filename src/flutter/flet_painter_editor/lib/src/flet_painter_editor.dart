@@ -53,7 +53,13 @@ class _FletPainterControlState extends State<FletPainterControl> {
   }
 
   void _initController() {
-    controller = PainterController();
+    controller = PainterController(
+      settings: PainterSettings(
+        object: ObjectSettings(
+          enlargeControlsResolver: () => true,
+        ),
+      ),
+    );
     controller.addListener(_handleControllerUpdate);
 
     // Initialize text settings
@@ -460,6 +466,16 @@ class _FletPainterControlState extends State<FletPainterControl> {
 
       case "focus":
         _focusNode.requestFocus();
+        break;
+
+      case "lockWidget":
+        bool lock = parseBool(args["lock"]) ?? false;
+        bool all = parseBool(args["all"]) ?? false;
+        if (all) {
+          lock ? controller.lockAllObjectDrawables() : controller.unlockAllObjectDrawables();
+        } else {
+          lock ? controller.lockSelectedObjectDrawable() : controller.unlockSelectedObjectDrawable();
+        }
         break;
     }
 
