@@ -17,7 +17,6 @@ class ObjectSettings {
   static const Set<TargetPlatform> _mobileTargetPlatforms = {
     TargetPlatform.android,
     TargetPlatform.fuchsia,
-    TargetPlatform.iOS
   };
 
   /// The layout-assist settings of the current object.
