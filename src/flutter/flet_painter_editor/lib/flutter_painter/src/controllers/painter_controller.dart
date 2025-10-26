@@ -368,6 +368,136 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     }
     selectObjectDrawable(null);
   }
+
+  /// Toggles the lock state of the selected object drawable.
+  ///
+  /// If no object is selected, nothing happens and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void toggleSelectedObjectDrawableLock() {
+    if (selectedObjectDrawable == null) return;
+    
+    final locked = !selectedObjectDrawable!.locked;
+    final newDrawable = selectedObjectDrawable!.copyWith(locked: locked);
+    replaceDrawable(selectedObjectDrawable!, newDrawable);
+  }
+
+  /// Locks the selected object drawable.
+  ///
+  /// If no object is selected, nothing happens and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void lockSelectedObjectDrawable() {
+    if (selectedObjectDrawable == null) return;
+    
+    final newDrawable = selectedObjectDrawable!.copyWith(locked: true);
+    replaceDrawable(selectedObjectDrawable!, newDrawable);
+  }
+
+  /// Unlocks the selected object drawable.
+  ///
+  /// If no object is selected, nothing happens and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void unlockSelectedObjectDrawable() {
+    if (selectedObjectDrawable == null) return;
+    
+    final newDrawable = selectedObjectDrawable!.copyWith(locked: false);
+    replaceDrawable(selectedObjectDrawable!, newDrawable);
+  }
+
+  /// Locks all object drawables in the controller.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void lockAllObjectDrawables({bool newAction = true}) {
+    final objectDrawables = value.drawables.whereType<ObjectDrawable>().toList();
+    if (objectDrawables.isEmpty) return;
+    
+    final lockedDrawables = objectDrawables.map((drawable) => 
+        drawable.copyWith(locked: true)).toList();
+    
+    for (int i = 0; i < objectDrawables.length; i++) {
+      replaceDrawable(objectDrawables[i], lockedDrawables[i], newAction: i == 0 ? newAction : false);
+    }
+  }
+
+  /// Unlocks all object drawables in the controller.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void unlockAllObjectDrawables({bool newAction = true}) {
+    final objectDrawables = value.drawables.whereType<ObjectDrawable>().toList();
+    if (objectDrawables.isEmpty) return;
+    
+    final unlockedDrawables = objectDrawables.map((drawable) => 
+        drawable.copyWith(locked: false)).toList();
+    
+    for (int i = 0; i < objectDrawables.length; i++) {
+      replaceDrawable(objectDrawables[i], unlockedDrawables[i], newAction: i == 0 ? newAction : false);
+    }
+  }
+
+  /// Locks specific object drawable.
+  ///
+  /// Returns `true` if [drawable] was found and locked, `false` otherwise.
+  /// If the return value is `false`, the controller value is unaffected.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  bool lockObjectDrawable(ObjectDrawable drawable, {bool newAction = true}) {
+    if (!value.drawables.contains(drawable)) return false;
+    
+    final newDrawable = drawable.copyWith(locked: true);
+    return replaceDrawable(drawable, newDrawable, newAction: newAction);
+  }
+
+  /// Unlocks specific object drawable.
+  ///
+  /// Returns `true` if [drawable] was found and unlocked, `false` otherwise.
+  /// If the return value is `false`, the controller value is unaffected.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  bool unlockObjectDrawable(ObjectDrawable drawable, {bool newAction = true}) {
+    if (!value.drawables.contains(drawable)) return false;
+    
+    final newDrawable = drawable.copyWith(locked: false);
+    return replaceDrawable(drawable, newDrawable, newAction: newAction);
+  }
 }
 
 /// The current paint mode, drawables and background values of a [FlutterPainter] widget.
