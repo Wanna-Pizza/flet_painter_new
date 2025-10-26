@@ -80,7 +80,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Used to highlight the controls when they are in use.
   Map<int, bool> controlsAreActive = {
-    for (var e in List.generate(8, (index) => index)) e: false
+    for (var e in List.generate(7, (index) => index + 1)) e: false
   };
 
   /// Subscription to the events coming from the controller.
@@ -193,10 +193,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                 child: Container(
                   child: freeStyleSettings.mode != FreeStyleMode.none
                       ? widget
-                      : MouseRegion(
-                          cursor: drawable.locked
-                              ? MouseCursor.defer
-                              : SystemMouseCursors.allScroll,
+                      : IgnorePointer(
+                          ignoring: drawable.locked,
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => tapDrawable(drawable),
@@ -257,34 +255,62 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                             },
                                           ),
                                         ),
-                                        if (settings
-                                            .showScaleRotationControlsResolver()) ...[
+                                        // Show controls normally - IgnorePointer handles blocking
+                                        if (settings.showScaleRotationControlsResolver()) ...[
+                                          // Rotation control (top-right)
                                           Positioned(
                                             top: objectPadding - (controlsSize),
-                                            left:
-                                                objectPadding - (controlsSize),
+                                            right: objectPadding - (controlsSize),
                                             width: controlsSize,
                                             height: controlsSize,
                                             child: MouseRegion(
-                                              cursor: SystemMouseCursors
-                                                  .resizeUpLeft,
+                                              cursor: initialScaleDrawables
+                                                      .containsKey(entry.key)
+                                                  ? SystemMouseCursors.grabbing
+                                                  : SystemMouseCursors.grab,
                                               child: GestureDetector(
                                                 onPanStart: (details) =>
-                                                    onScaleControlPanStart(
-                                                        0, entry, details),
+                                                    onRotationControlPanStart(
+                                                        2, entry, details),
                                                 onPanUpdate: (details) =>
-                                                    onScaleControlPanUpdate(
-                                                        entry,
-                                                        details,
-                                                        constraints,
-                                                        true),
+                                                    onRotationControlPanUpdate(
+                                                        entry, details, size),
                                                 onPanEnd: (details) =>
-                                                    onScaleControlPanEnd(
-                                                        0, entry, details),
+                                                    onRotationControlPanEnd(
+                                                        2, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
-                                                      controlsAreActive[0] ??
+                                                      controlsAreActive[2] ??
                                                           false,
+                                                  child: Icon(
+                                                    Icons.rotate_right,
+                                                    size: 14,
+                                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Delete button (top-left)
+                                          Positioned(
+                                            top: objectPadding - (controlsSize),
+                                            left: objectPadding - (controlsSize),
+                                            width: controlsSize,
+                                            height: controlsSize,
+                                            child: MouseRegion(
+                                              cursor: SystemMouseCursors.click,
+                                              child: GestureDetector(
+                                                onTap: () => deleteDrawable(drawable),
+                                                child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
+                                                  active: false,
+                                                  inactiveColor: const Color.fromARGB(255, 255, 255, 255),
+                                                  child: Icon(
+                                                    Icons.close,
+                                                    size: 14,
+                                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -313,6 +339,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     onScaleControlPanEnd(
                                                         1, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
                                                       controlsAreActive[1] ??
                                                           false,
@@ -320,36 +347,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            top: objectPadding - (controlsSize),
-                                            right:
-                                                objectPadding - (controlsSize),
-                                            width: controlsSize,
-                                            height: controlsSize,
-                                            child: MouseRegion(
-                                              cursor: initialScaleDrawables
-                                                      .containsKey(entry.key)
-                                                  ? SystemMouseCursors.grabbing
-                                                  : SystemMouseCursors.grab,
-                                              child: GestureDetector(
-                                                onPanStart: (details) =>
-                                                    onRotationControlPanStart(
-                                                        2, entry, details),
-                                                onPanUpdate: (details) =>
-                                                    onRotationControlPanUpdate(
-                                                        entry, details, size),
-                                                onPanEnd: (details) =>
-                                                    onRotationControlPanEnd(
-                                                        2, entry, details),
-                                                child: _ObjectControlBox(
-                                                  shape: BoxShape.circle,
-                                                  active:
-                                                      controlsAreActive[2] ??
-                                                          false,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          // Crop free control (bottom-right)
                                           Positioned(
                                             bottom:
                                                 objectPadding - (controlsSize),
@@ -374,14 +372,21 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     onScaleControlPanEnd(
                                                         3, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
                                                       controlsAreActive[3] ??
                                                           false,
+                                                  child: Icon(
+                                                    Icons.crop_free,
+                                                    size: 14,
+                                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ],
+                                        // Show resize controls normally - IgnorePointer handles blocking
                                         if (entry.value is Sized2DDrawable) ...[
                                           Positioned(
                                             top: objectPadding - (controlsSize),
@@ -408,6 +413,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     onResizeControlPanEnd(
                                                         4, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
                                                       controlsAreActive[4] ??
                                                           false,
@@ -441,6 +447,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     onResizeControlPanEnd(
                                                         5, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
                                                       controlsAreActive[5] ??
                                                           false,
@@ -474,6 +481,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     onResizeControlPanEnd(
                                                         6, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
                                                       controlsAreActive[6] ??
                                                           false,
@@ -507,6 +515,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     onResizeControlPanEnd(
                                                         7, entry, details),
                                                 child: _ObjectControlBox(
+                                                  shape: BoxShape.circle,
                                                   active:
                                                       controlsAreActive[7] ??
                                                           false,
@@ -593,8 +602,6 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Dispatches an [ObjectDrawableNotification] that the object was tapped.
   void tapDrawable(ObjectDrawable drawable) {
-    if (drawable.locked) return;
-
     if (controller?.selectedObjectDrawable == drawable) {
       ObjectDrawableReselectedNotification(drawable).dispatch(context);
     } else {
@@ -617,7 +624,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     final index = entry.key;
     final drawable = entry.value;
 
-    if (index < 0 || drawable.locked) return;
+    if (index < 0) return;
 
     setState(() {
       // selectedDrawableIndex = index;
@@ -677,6 +684,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
 
     final index = entry.key;
     final drawable = entry.value;
+    
     if (index < 0) return;
 
     final initialDrawable = initialScaleDrawables[index];
@@ -1049,6 +1057,14 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
           _m4storage[10] * _m4storage[10]);
     });
   }
+
+  /// Deletes the given drawable from the painter.
+  void deleteDrawable(ObjectDrawable drawable) {
+    setState(() {
+      PainterController.of(context).removeDrawable(drawable);
+      controller?.deselectObjectDrawable();
+    });
+  }
 }
 
 /// The control box container (only the UI, no logic).
@@ -1071,6 +1087,9 @@ class _ObjectControlBox extends StatelessWidget {
   /// Defaults to [Colors.black].
   final Color shadowColor;
 
+  /// Optional child widget to display inside the control box.
+  final Widget? child;
+
   /// Creates an [_ObjectControlBox] with the given [shape] and [active].
   ///
   /// By default, it will be a [BoxShape.rectangle] shape and not active.
@@ -1081,6 +1100,7 @@ class _ObjectControlBox extends StatelessWidget {
     this.inactiveColor = Colors.white,
     this.activeColor,
     this.shadowColor = Colors.black,
+    this.child,
   }) : super(key: key);
 
   @override
@@ -1101,6 +1121,7 @@ class _ObjectControlBox extends StatelessWidget {
           )
         ],
       ),
+      child: child,
     );
   }
 }
