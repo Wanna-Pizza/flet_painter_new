@@ -66,7 +66,10 @@ class _TextWidgetState extends State<_TextWidget> {
     final drawable = notification.drawable;
 
     if (drawable is TextDrawable) {
-      openTextEditor(drawable);
+      // Don't open editor if locked
+      if (!drawable.locked) {
+        openTextEditor(drawable);
+      }
       // Mark notification as handled
       return true;
     }
@@ -264,6 +267,8 @@ class EditTextWidgetState extends State<EditTextWidget>
                 textAlign: TextAlign.center,
                 textAlignVertical: TextAlignVertical.center,
                 onEditingComplete: onEditingComplete,
+                // Simple disable if locked
+                enabled: !widget.drawable.locked,
               ),
             ),
           ),
