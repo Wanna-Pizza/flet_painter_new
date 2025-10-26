@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
@@ -21,7 +22,6 @@ import '../../controllers/painter_controller.dart';
 import '../../controllers/helpers/border_box_shadow.dart';
 import '../../extensions/painter_controller_helper_extension.dart';
 import 'painter_controller_widget.dart';
-import 'dart:math' as math;
 
 part 'free_style_widget.dart';
 part 'text_widget.dart';
